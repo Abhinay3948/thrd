@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Update Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Upload CSV Files</h1>
+        <div class="space-y-4">
+            <div>
+                <label for="products" class="block text-sm font-medium text-gray-700">Products CSV</label>
+                <input type="file" id="products" accept=".csv" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+            </div>
+            <div>
+                <label for="sales" class="block text-sm font-medium text-gray-700">Sales CSV</label>
+                <input type="file" id="sales" accept=".csv" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+            </div>
+            <button id="submit" class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700">Update Prices</button>
+        </div>
+        <div id="message" class="mt-4 text-center text-sm"></div>
+    </div>
+
+    <script>
+        document.getElementById('submit').addEventListener('click', async () => {
+            const productsFile = document.getElementById('products').files[0];
+            const salesFile = document.getElementById('sales').files[0];
+            const messageDiv = document.getElementById('message');
+
+            if (!productsFile || !salesFile) {
+                messageDiv.innerHTML = '<span class="text-red-500">Please upload both CSV files.</span>';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('products', productsFile);
+            formData.append('sales', salesFile);
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    window.location.href = '/result';
+                } else {
+                    messageDiv.innerHTML = '<span class="text-red-500">Error processing files. Please try again.</span>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<span class="text-red-500">Something went wrong. Please try again.</span>';
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
